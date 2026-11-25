@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  lp-ai:
+    build: .
+    container_name: lp_ai
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+    restart: always
+    security_opt:
+      - no-new-privileges:true
