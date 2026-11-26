@@ -43,7 +43,7 @@ export interface Material {
   file_size: number | null;
 }
 
-export type OpenAIModel = string;
+export type AIProvider = 'gemini' | 'groq';
 
 export type TranslateMode = 'code' | 'language' | 'document' | 'custom';
 
@@ -53,6 +53,7 @@ export interface TranslateBody {
   outputLanguage: string;
   inputCode: string;
   instructions?: string;
-  model: OpenAIModel;
+  provider: AIProvider;
+  model: string;
   apiKey: string;
 }
