@@ -35,6 +35,8 @@ export default function InstructorDashboard() {
 
   useEffect(() => { load(); }, [load]);
 
+  const courseList = courses ?? [];
+
   const create = async (e: FormEvent) => {
     e.preventDefault();
     if (!profile) return;
@@ -62,11 +64,11 @@ export default function InstructorDashboard() {
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           <div>
             <h1 className="mb-4 text-3xl font-bold">My courses</h1>
-            {courses.length === 0 ? (
+            {courseList.length === 0 ? (
               <p className="text-muted-foreground">No courses yet. Create your first one.</p>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
-                {courses.map((c) => (
+                {courseList.map((c) => (
                   <CourseCard key={c.id} course={c} href={`/dashboard/instructor/${c.id}`} />
                 ))}
               </div>

@@ -46,6 +46,8 @@ export default function StudentDashboard() {
     });
   }, [profile, reloadCount]);
 
+  const rowList = rows ?? [];
+
   return (
     <Page title="My learning">
       {profileError ? (
@@ -63,7 +65,7 @@ export default function StudentDashboard() {
             <div>
               <h1 className="text-3xl font-bold">Welcome, {profile?.full_name || 'student'}</h1>
               <p className="text-muted-foreground">
-                {rows.length} enrolled course{rows.length === 1 ? '' : 's'}
+                {rowList.length} enrolled course{rowList.length === 1 ? '' : 's'}
               </p>
             </div>
             <Button asChild><Link href="/courses">Find courses</Link></Button>
@@ -73,11 +75,11 @@ export default function StudentDashboard() {
               Your instructor request is waiting for administrator approval.
             </p>
           )}
-          {rows.length === 0 ? (
+          {rowList.length === 0 ? (
             <p className="text-muted-foreground">You have not enrolled in any course yet.</p>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {rows.map(({ course, total, done }) => (
+              {rowList.map(({ course, total, done }) => (
                 <div key={course.id} className="space-y-2">
                   <CourseCard course={course} href={`/learn/${course.id}`} />
                   <div className="h-2 overflow-hidden rounded-full bg-secondary">
