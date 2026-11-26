@@ -2,6 +2,7 @@ import { Page } from '@/components/layout/Page';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookOpen, Languages, ShieldCheck, Users } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 const features = [
@@ -15,8 +16,15 @@ export default function Home() {
   return (
     <Page title="Learning & Power AI">
       <div className="mx-auto mt-10 max-w-3xl text-center sm:mt-16">
-        <h1 className="text-4xl font-bold sm:text-6xl">
-          Learning &amp; <span className="text-primary">Power AI</span>
+        <h1>
+          <Image
+            src="/learning-power-ai-logo.png"
+            alt="Learning and Power AI"
+            width={1408}
+            height={792}
+            priority
+            className="mx-auto h-auto w-72 rounded-xl sm:w-96"
+          />
         </h1>
         <p className="mt-4 text-lg text-muted-foreground">
           Learn anything, teach anyone and translate everything, from code to human languages.
