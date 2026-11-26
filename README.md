@@ -41,7 +41,7 @@ Learning & Power AI (L&P AI) is a full-stack learning platform for creating and 
 - **UI:** React 18, Tailwind CSS, Radix UI, Lucide React
 - **Backend and database:** Supabase PostgreSQL, Auth, Storage, and Row-Level Security
 - **AI:** Google Gemini and Groq API
-- **Editor:** CodeMirror
+- **Editor:** VSCode
 - **Deployment:** Docker and Docker Compose
 
 ## Project structure
