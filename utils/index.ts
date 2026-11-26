@@ -1,4 +1,4 @@
-import { TranslateMode } from '@/types/types';
+import { AIProvider, TranslateMode } from '@/types/types';
 import endent from 'endent';
 import {
   createParser,
@@ -14,14 +14,14 @@ interface PromptArgs {
   instructions?: string;
 }
 
-export class OpenAIRequestError extends Error {
+export class AIRequestError extends Error {
   constructor(
     message: string,
     public readonly status: number,
     public readonly code?: string,
   ) {
     super(message);
-    this.name = 'OpenAIRequestError';
+    this.name = 'AIRequestError';
   }
 }
 
@@ -137,28 +137,54 @@ export const createPrompt = ({
   `;
 };
 
-export const OpenAIStream = async (args: PromptArgs, model: string, key: string) => {
+const PROVIDER_CONFIG: Record<AIProvider, { baseUrl: string; label: string }> = {
+  gemini: {
+    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    label: 'Gemini',
+  },
+  groq: {
+    baseUrl: 'https://api.groq.com/openai/v1',
+    label: 'Groq',
+  },
+};
+
+export const AIStream = async (
+  args: PromptArgs,
+  provider: AIProvider,
+  model: string,
+  key: string,
+) => {
   const prompt = createPrompt(args);
-  const system = { role: 'system', content: prompt };
-  const apiKey = key || process.env.OPENAI_API_KEY;
+  const config = PROVIDER_CONFIG[provider];
+  const serverKey = provider === 'gemini' ? process.env.GEMINI_API_KEY : process.env.GROQ_API_KEY;
+  const apiKey = key || serverKey;
 
   if (!apiKey) {
-    throw new OpenAIRequestError('No OpenAI API key is configured.', 503, 'missing_api_key');
+    throw new AIRequestError(`No ${config.label} API key is configured.`, 503, 'missing_api_key');
   }
 
-  const res = await fetch(`https://api.openai.com/v1/chat/completions`, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    method: 'POST',
-    body: JSON.stringify({
-      model,
-      messages: [system],
-      temperature: 0,
-      stream: true,
-    }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${config.baseUrl}/chat/completions`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0,
+        stream: true,
+      }),
+    });
+  } catch {
+    throw new AIRequestError(
+      `Could not connect to ${config.label}. Check that the server can reach the provider over HTTPS, then try again.`,
+      503,
+      'provider_unreachable',
+    );
+  }
 
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -166,11 +192,16 @@ export const OpenAIStream = async (args: PromptArgs, model: string, key: string)
   if (res.status !== 200) {
     const payload = await res.json().catch(() => null);
     const error = payload?.error;
-    throw new OpenAIRequestError(
+    throw new AIRequestError(
       typeof error?.message === 'string' ? error.message : res.statusText,
       res.status,
       typeof error?.code === 'string' ? error.code : undefined,
     );
+  }
+
+  const responseBody = res.body;
+  if (!responseBody) {
+    throw new AIRequestError('The AI provider returned an empty response.', 502);
   }
 
   const stream = new ReadableStream({
@@ -195,9 +226,16 @@ export const OpenAIStream = async (args: PromptArgs, model: string, key: string)
       };
 
       const parser = createParser(onParse);
+      const reader = responseBody.getReader();
 
-      for await (const chunk of res.body as any) {
-        parser.feed(decoder.decode(chunk));
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          parser.feed(decoder.decode(value, { stream: true }));
+        }
+      } finally {
+        reader.releaseLock();
       }
     },
   });

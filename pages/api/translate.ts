@@ -1,5 +1,5 @@
 import { TranslateBody } from '@/types/types';
-import { OpenAIRequestError, OpenAIStream } from '@/utils';
+import { AIRequestError, AIStream } from '@/utils';
 
 export const config = {
   runtime: 'edge',
@@ -30,23 +30,28 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response('Unauthorized', { status: 401 });
     }
 
-    const { mode, inputLanguage, outputLanguage, inputCode, instructions, model, apiKey } =
+    const { mode, inputLanguage, outputLanguage, inputCode, instructions, provider, model, apiKey } =
       (await req.json()) as TranslateBody;
 
-    const stream = await OpenAIStream(
+    if (provider !== 'gemini' && provider !== 'groq') {
+      return Response.json({ error: 'Select a supported AI provider.' }, { status: 400 });
+    }
+
+    const stream = await AIStream(
       { mode, inputLanguage, outputLanguage, inputCode, instructions },
+      provider,
       model,
       apiKey,
     );
 
     return new Response(stream);
   } catch (error) {
-    if (error instanceof OpenAIRequestError) {
+    if (error instanceof AIRequestError) {
       if (error.code === 'insufficient_quota' || error.code === 'credit_balance_exhausted') {
         return Response.json(
           {
             error:
-              'The OpenAI API key being used has no credits remaining. Add API billing/credits to that OpenAI account, or enter a funded API key above.',
+              'The selected provider API key has no credits remaining. Add billing/credits to that provider account, or enter a funded API key above.',
           },
           { status: 402 },
         );
@@ -56,10 +61,20 @@ const handler = async (req: Request): Promise<Response> => {
         return Response.json({ error: error.message }, { status: 503 });
       }
 
-      console.error(`OpenAI request failed (${error.status}): ${error.message}`);
+      if (error.code === 'provider_unreachable') {
+        console.error(`${error.message} (${error.status})`);
+        return Response.json({ error: error.message }, { status: 503 });
+      }
+
+      console.error(`AI provider request failed (${error.status}): ${error.message}`);
       return Response.json(
-        { error: 'The OpenAI request failed. Check the API key and selected model.' },
-        { status: error.status === 401 ? 401 : 502 },
+        {
+          error:
+            error.status === 503
+              ? 'The AI provider is temporarily unavailable. Please try again shortly.'
+              : 'The AI provider request failed. Check the API key and selected model.',
+        },
+        { status: error.status === 401 ? 401 : error.status === 503 ? 503 : 502 },
       );
     }
 

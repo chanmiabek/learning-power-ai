@@ -9,10 +9,11 @@ import { ModelSelect } from '@/components/ModelSelect';
 import { TextBlock } from '@/components/TextBlock';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Select } from '@/components/ui/select';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
-import { OpenAIModel, TranslateBody, TranslateMode } from '@/types/types';
+import { AIProvider, TranslateBody, TranslateMode } from '@/types/types';
 import { Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -30,6 +31,11 @@ const DEFAULTS: Record<TranslateMode, [string, string]> = {
   custom: ['Any language', 'English'],
 };
 
+const PROVIDERS: { id: AIProvider; label: string }[] = [
+  { id: 'gemini', label: 'Google Gemini' },
+  { id: 'groq', label: 'Groq' },
+];
+
 export function Translator() {
   const { session, profile } = useAuth();
   const [mode, setMode] = useState<TranslateMode>('code');
@@ -38,10 +44,15 @@ export function Translator() {
   const [inputCode, setInputCode] = useState('');
   const [outputCode, setOutputCode] = useState('');
   const [instructions, setInstructions] = useState('');
-  const [model, setModel] = useState<OpenAIModel>('gpt-4o-mini');
+  const [provider, setProvider] = useState<AIProvider>('gemini');
+  const [model, setModel] = useState('gemini-4-hydrogen');
   const [loading, setLoading] = useState(false);
   const [hasTranslated, setHasTranslated] = useState(false);
-  const [apiKey, setApiKey] = useState('');
+  const [apiKeys, setApiKeys] = useState<Record<AIProvider, string>>({
+    gemini: '',
+    groq: '',
+  });
+  const apiKey = apiKeys[provider];
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -61,7 +72,7 @@ export function Translator() {
   };
 
   const handleTranslate = async () => {
-    const maxLength = model === 'gpt-3.5-turbo' ? 6000 : 24000;
+    const maxLength = 24000;
     setError('');
 
     if (mode !== 'custom' && inputLanguage === outputLanguage) {
@@ -90,6 +101,7 @@ export function Translator() {
       outputLanguage,
       inputCode,
       instructions,
+      provider,
       model,
       apiKey,
     };
@@ -110,7 +122,7 @@ export function Translator() {
         payload?.error ||
           (response.status === 401
             ? 'Please sign in to use the translator.'
-            : 'Something went wrong. Check your OpenAI API key.'),
+            : `Something went wrong. Check your ${provider === 'gemini' ? 'Gemini' : 'Groq'} API key and selected model.`),
       );
       return;
     }
@@ -160,9 +172,19 @@ export function Translator() {
   }, [outputLanguage]);
 
   useEffect(() => {
-    const k = localStorage.getItem('apiKey');
-    if (k) setApiKey(k);
+    localStorage.removeItem('apiKey');
+    setApiKeys({
+      gemini: localStorage.getItem('geminiApiKey') || '',
+      groq: localStorage.getItem('groqApiKey') || '',
+    });
   }, []);
+
+  const changeProvider = (nextProvider: AIProvider) => {
+    setProvider(nextProvider);
+    setModel(
+      nextProvider === 'gemini' ? 'gemini-4-hydrogen' : 'openai/gpt-oss-120b',
+    );
+  };
 
   return (
     <div className="flex flex-col items-center">
@@ -186,15 +208,30 @@ export function Translator() {
       <div className="mt-6 text-center text-sm">
         <APIKeyInput
           apiKey={apiKey}
+          providerName={provider === 'gemini' ? 'Gemini' : 'Groq'}
           onChange={(v) => {
-            setApiKey(v);
-            localStorage.setItem('apiKey', v);
+            setApiKeys((keys) => ({ ...keys, [provider]: v }));
+            localStorage.setItem(provider === 'gemini' ? 'geminiApiKey' : 'groqApiKey', v);
           }}
         />
       </div>
 
       <div className="mt-2 flex items-center space-x-2">
-        <ModelSelect model={model} onChange={setModel} />
+        <Select
+          className="w-[160px]"
+          value={provider}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value === 'gemini' || value === 'groq') changeProvider(value);
+          }}
+        >
+          {PROVIDERS.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.label}
+            </option>
+          ))}
+        </Select>
+        <ModelSelect provider={provider} model={model} onChange={setModel} />
         <Button className="w-[140px] font-bold" onClick={handleTranslate} disabled={loading}>
           {loading ? 'Translating...' : 'Translate'}
         </Button>
