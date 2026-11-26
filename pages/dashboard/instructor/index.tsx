@@ -61,9 +61,9 @@ export default function InstructorDashboard() {
           <Button variant="outline" onClick={load}>Try again</Button>
         </div>
       ) : (
-        <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-          <div>
-            <h1 className="mb-4 text-3xl font-bold">My courses</h1>
+        <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="min-w-0">
+            <h1 className="mb-4 text-2xl font-bold sm:text-3xl">My courses</h1>
             {courseList.length === 0 ? (
               <p className="text-muted-foreground">No courses yet. Create your first one.</p>
             ) : (

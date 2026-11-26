@@ -16,7 +16,7 @@ export function CourseCard({ course, href }: { course: Course; href?: string }) 
           </div>
         )}
         <CardHeader className="pb-2">
-          <CardTitle className="line-clamp-2">{course.title}</CardTitle>
+          <CardTitle className="line-clamp-2 break-words">{course.title}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <p className="line-clamp-2 text-sm text-muted-foreground">{course.description}</p>

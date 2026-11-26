@@ -61,14 +61,16 @@ export default function StudentDashboard() {
         </div>
       ) : (
         <>
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">Welcome, {profile?.full_name || 'student'}</h1>
+          <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+            <div className="min-w-0">
+              <h1 className="break-words text-2xl font-bold sm:text-3xl">
+                Welcome, {profile?.full_name || 'student'}
+              </h1>
               <p className="text-muted-foreground">
                 {rowList.length} enrolled course{rowList.length === 1 ? '' : 's'}
               </p>
             </div>
-            <Button asChild><Link href="/courses">Find courses</Link></Button>
+            <Button asChild className="w-full sm:w-auto"><Link href="/courses">Find courses</Link></Button>
           </div>
           {profile?.wants_instructor && profile.role === 'student' && (
             <p className="mb-4 rounded-md border p-3 text-sm text-muted-foreground">

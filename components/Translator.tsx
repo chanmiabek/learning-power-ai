@@ -216,9 +216,9 @@ export function Translator() {
         />
       </div>
 
-      <div className="mt-2 flex items-center space-x-2">
+      <div className="mt-2 flex w-full max-w-2xl flex-wrap items-center justify-center gap-2">
         <Select
-          className="w-[160px]"
+          className="min-w-0 flex-1 sm:w-[160px] sm:flex-none"
           value={provider}
           onChange={(e) => {
             const value = e.target.value;
@@ -232,7 +232,7 @@ export function Translator() {
           ))}
         </Select>
         <ModelSelect provider={provider} model={model} onChange={setModel} />
-        <Button className="w-[140px] font-bold" onClick={handleTranslate} disabled={loading}>
+        <Button className="w-full font-bold sm:w-[140px]" onClick={handleTranslate} disabled={loading}>
           {loading ? 'Translating...' : 'Translate'}
         </Button>
       </div>
@@ -264,8 +264,8 @@ export function Translator() {
         )}
       </div>
 
-      <div className="mt-6 flex w-full max-w-[1200px] flex-col justify-between sm:flex-row sm:space-x-4">
-        <div className="flex flex-col justify-center space-y-2 sm:w-2/4">
+      <div className="mt-6 flex w-full max-w-[1200px] flex-col gap-6 lg:flex-row">
+        <div className="flex min-w-0 flex-col justify-center space-y-2 lg:w-1/2">
           <div className="flex items-center justify-center gap-2 text-xl font-bold">
             Input
             {mode === 'document' && (
@@ -318,7 +318,7 @@ export function Translator() {
           )}
         </div>
 
-        <div className="mt-8 flex flex-col justify-center space-y-2 sm:mt-0 sm:w-2/4">
+        <div className="flex min-w-0 flex-col justify-center space-y-2 lg:w-1/2">
           <div className="text-center text-xl font-bold">Output</div>
 
           {mode !== 'custom' ? (

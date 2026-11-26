@@ -20,7 +20,7 @@ const MODELS: Record<AIProvider, { id: string; label: string }[]> = {
 };
 
 export const ModelSelect: FC<Props> = ({ provider, model, onChange }) => (
-  <Select className="w-[160px]" value={model} onChange={(e) => onChange(e.target.value)}>
+  <Select className="min-w-0 flex-1 sm:w-[160px] sm:flex-none" value={model} onChange={(e) => onChange(e.target.value)}>
     {MODELS[provider].map((option) => (
       <option key={option.id} value={option.id}>
         {option.label}

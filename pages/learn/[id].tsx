@@ -66,15 +66,15 @@ export default function Learn() {
         <p className="text-center text-muted-foreground">You do not have access to this course. Enroll first.</p>
       ) : (
         <div className="mx-auto grid max-w-[1200px] gap-6 lg:grid-cols-[320px_1fr]">
-          <Card className="h-fit">
+          <Card className="h-fit min-w-0 lg:sticky lg:top-20">
             <CardHeader>
-              <CardTitle>{course.title}</CardTitle>
+              <CardTitle className="break-words">{course.title}</CardTitle>
               <div className="h-2 overflow-hidden rounded-full bg-secondary">
                 <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
               </div>
               <p className="text-xs text-muted-foreground">{pct}% complete</p>
             </CardHeader>
-            <CardContent className="space-y-1">
+            <CardContent className="max-h-[45vh] space-y-1 overflow-y-auto lg:max-h-[calc(100vh-15rem)]">
               {lessons.map((l, i) => (
                 <button
                   key={l.id}
@@ -82,7 +82,7 @@ export default function Learn() {
                   className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm hover:bg-accent ${current === l.id ? 'bg-accent' : ''}`}
                 >
                   {done.has(l.id) ? <CheckCircle2 className="h-4 w-4 shrink-0 text-green-400" /> : <Circle className="h-4 w-4 shrink-0" />}
-                  {i + 1}. {l.title}
+                  <span className="min-w-0 break-words">{i + 1}. {l.title}</span>
                 </button>
               ))}
               {lessons.length === 0 && <p className="text-sm text-muted-foreground">No lessons yet.</p>}

@@ -15,7 +15,7 @@ const features = [
 export default function Home() {
   return (
     <Page title="Learning & Power AI">
-      <div className="mx-auto mt-10 max-w-3xl text-center sm:mt-16">
+      <div className="mx-auto mt-6 max-w-3xl text-center sm:mt-16">
         <h1>
           <Image
             src="/learning-power-ai-logo.png"
@@ -23,13 +23,13 @@ export default function Home() {
             width={1408}
             height={792}
             priority
-            className="mx-auto h-auto w-72 rounded-xl sm:w-96"
+            className="mx-auto h-auto w-full max-w-xs rounded-xl sm:max-w-sm"
           />
         </h1>
-        <p className="mt-4 text-lg text-muted-foreground">
+        <p className="mt-4 text-base text-muted-foreground sm:text-lg">
           Learn anything, teach anyone and translate everything, from code to human languages.
         </p>
-        <div className="mt-8 flex justify-center gap-3">
+        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Button asChild size="lg">
             <Link href="/courses">Browse courses</Link>
           </Button>

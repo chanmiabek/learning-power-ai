@@ -113,10 +113,10 @@ export default function EditCourse() {
       {!allowed || !course ? (
         <Loading />
       ) : (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid min-w-0 gap-6 xl:grid-cols-2">
           <Card>
-            <CardHeader className="flex-row items-center justify-between space-y-0">
-              <CardTitle>Course details</CardTitle>
+            <CardHeader className="flex-wrap items-center justify-between gap-2 space-y-0">
+              <CardTitle className="min-w-0 break-words">Course details</CardTitle>
               <Badge variant={course.is_published ? 'default' : 'secondary'}>{course.is_published ? 'Published' : 'Draft'}</Badge>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -124,7 +124,7 @@ export default function EditCourse() {
                 <Input value={course.title} onChange={(e) => setCourse({ ...course, title: e.target.value })} /></div>
               <div className="space-y-1"><Label>Description</Label>
                 <Textarea rows={5} value={course.description ?? ''} onChange={(e) => setCourse({ ...course, description: e.target.value })} /></div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1"><Label>Category</Label>
                   <Input value={course.category ?? ''} onChange={(e) => setCourse({ ...course, category: e.target.value })} /></div>
                 <div className="space-y-1"><Label>Level</Label>
@@ -149,13 +149,13 @@ export default function EditCourse() {
             <CardHeader><CardTitle>Learning materials</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               <input ref={fileRef} type="file" multiple hidden onChange={(e) => uploadMaterials(e.target.files)} />
-              <Button variant="outline" disabled={busy === 'material'} onClick={() => fileRef.current?.click()}>
+              <Button className="h-auto min-h-10 max-w-full whitespace-normal py-2 text-left" variant="outline" disabled={busy === 'material'} onClick={() => fileRef.current?.click()}>
                 <Upload className="mr-2 h-4 w-4" /> {busy === 'material' ? 'Uploading...' : 'Upload PDFs, documents, videos...'}
               </Button>
               {materials.map((m) => (
-                <div key={m.id} className="flex items-center gap-2 rounded-md border p-2 text-sm">
-                  <FileText className="h-4 w-4" />
-                  <a href={m.file_url} target="_blank" rel="noreferrer" className="truncate hover:underline">{m.title}</a>
+                <div key={m.id} className="flex min-w-0 items-center gap-2 rounded-md border p-2 text-sm">
+                  <FileText className="h-4 w-4 shrink-0" />
+                  <a href={m.file_url} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate hover:underline">{m.title}</a>
                   <span className="ml-auto text-xs text-muted-foreground">{formatBytes(m.file_size)}</span>
                   <Button size="icon" variant="ghost" onClick={() => deleteMaterial(m)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
@@ -163,13 +163,13 @@ export default function EditCourse() {
             </CardContent>
           </Card>
 
-          <Card className="lg:col-span-2">
+          <Card className="xl:col-span-2">
             <CardHeader><CardTitle>Lessons ({lessons.length})</CardTitle></CardHeader>
             <CardContent className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
                 {lessons.map((l, i) => (
-                  <div key={l.id} className="flex items-center gap-2 rounded-md border p-2 text-sm">
-                    {i + 1}. {l.title}
+                  <div key={l.id} className="flex min-w-0 items-center gap-2 rounded-md border p-2 text-sm">
+                    <span className="min-w-0 flex-1 break-words">{i + 1}. {l.title}</span>
                     {l.video_url && <Badge variant="secondary">video</Badge>}
                     <Button className="ml-auto" size="icon" variant="ghost" onClick={() => deleteLesson(l)}><Trash2 className="h-4 w-4" /></Button>
                   </div>

@@ -55,12 +55,12 @@ export default function CourseDetail() {
             {course.level && <Badge variant="outline">{course.level}</Badge>}
             {!course.is_published && <Badge variant="destructive">Draft</Badge>}
           </div>
-          <h1 className="text-4xl font-bold">{course.title}</h1>
+          <h1 className="break-words text-3xl font-bold sm:text-4xl">{course.title}</h1>
           <p className="text-sm text-muted-foreground">By {course.profiles?.full_name || 'Instructor'}</p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {course.thumbnail_url && <img src={course.thumbnail_url} alt="" className="w-full rounded-lg" />}
           <p className="whitespace-pre-wrap">{course.description}</p>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             {enrolled || canManage ? (
               <Button asChild><Link href={`/learn/${course.id}`}>{enrolled ? 'Continue learning' : 'Preview course'}</Link></Button>
             ) : (

@@ -99,8 +99,8 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <>
-          <h1 className="mb-4 text-3xl font-bold">Super Admin Dashboard</h1>
-          <div className="mb-6 flex gap-2">
+          <h1 className="mb-4 text-2xl font-bold sm:text-3xl">Super Admin Dashboard</h1>
+          <div className="mb-6 flex flex-wrap gap-2">
             {(['overview', 'users', 'courses', 'settings'] as Tab[]).map((t) => (
               <button key={t} onClick={() => setTab(t)}
                 className={cn('rounded-full border px-4 py-1.5 text-sm capitalize', tab === t ? 'border-primary bg-primary' : 'hover:bg-accent')}>
@@ -122,13 +122,13 @@ export default function AdminDashboard() {
 
           {tab === 'users' && (
             <div className="space-y-3">
-              <Input className="max-w-sm" placeholder="Search users..." value={q} onChange={(e) => setQ(e.target.value)} />
+              <Input className="w-full sm:max-w-sm" placeholder="Search users..." value={q} onChange={(e) => setQ(e.target.value)} />
               {shown.map((u) => (
                 <Card key={u.id}>
                   <CardContent className="flex flex-wrap items-center gap-3 p-4">
-                    <div className="min-w-[200px] flex-1">
-                      <div className="font-medium">{u.full_name || 'No name'}</div>
-                      <div className="text-sm text-muted-foreground">{u.email}</div>
+                    <div className="min-w-0 flex-1 sm:min-w-[200px]">
+                      <div className="break-words font-medium">{u.full_name || 'No name'}</div>
+                      <div className="break-all text-sm text-muted-foreground">{u.email}</div>
                     </div>
                     {u.wants_instructor && u.role === 'student' && (
                       <>
@@ -136,7 +136,7 @@ export default function AdminDashboard() {
                         <Button size="sm" onClick={() => updateUser(u.id, { role: 'instructor', wants_instructor: false })}>Approve</Button>
                       </>
                     )}
-                    <Select className="w-36" value={u.role} disabled={u.id === me?.id}
+                    <Select className="w-full sm:w-36" value={u.role} disabled={u.id === me?.id}
                       onChange={(e) => updateUser(u.id, { role: e.target.value as Role })}>
                       <option value="student">Student</option>
                       <option value="instructor">Instructor</option>
@@ -154,7 +154,7 @@ export default function AdminDashboard() {
 
           {tab === 'courses' && (
             <div className="space-y-3">
-              <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="mb-4 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
                 <p className="text-sm text-muted-foreground">Manage courses across the platform.</p>
                 <Button asChild>
                   <Link href="/dashboard/instructor#new-course">Create course</Link>
@@ -163,8 +163,8 @@ export default function AdminDashboard() {
               {courses.map((c) => (
                 <Card key={c.id}>
                   <CardContent className="flex flex-wrap items-center gap-3 p-4">
-                    <div className="min-w-[200px] flex-1">
-                      <Link href={`/dashboard/instructor/${c.id}`} className="font-medium hover:underline">{c.title}</Link>
+                    <div className="min-w-0 flex-1 sm:min-w-[200px]">
+                      <Link href={`/dashboard/instructor/${c.id}`} className="break-words font-medium hover:underline">{c.title}</Link>
                       <div className="text-sm text-muted-foreground">by {c.profiles?.full_name || 'Admin'} · {c.category}</div>
                     </div>
                     <Badge variant={c.is_published ? 'default' : 'secondary'}>{c.is_published ? 'Published' : 'Draft'}</Badge>
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
               <CardHeader><CardTitle>Platform settings</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 {Object.entries(SETTING_LABELS).map(([key, label]) => (
-                  <label key={key} className="flex items-center justify-between text-sm">
+                  <label key={key} className="flex items-start justify-between gap-4 text-sm">
                     {label}
                     <input type="checkbox" checked={settings[key] === true} onChange={(e) => setSetting(key, e.target.checked)} />
                   </label>

@@ -33,7 +33,7 @@ export const CodeBlock: FC<Props> = ({ code, editable = false, onChange = () => 
       <CodeMirror
         editable={editable}
         value={code}
-        minHeight="500px"
+        minHeight="320px"
         extensions={[StreamLanguage.define(go)]}
         theme={tokyoNight}
         onChange={(value) => onChange(value)}
